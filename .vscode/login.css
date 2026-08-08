@@ -1,0 +1,72 @@
+/*Body style*/
+        body{
+          font- font-family: Arial, Helvetica,sanser if;
+          background: linearGradient
+        
+           
+
+        #screen{
+            width: 200px;
+            height: 40px;
+            font-size: 20px;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        button{
+            width: 45px;
+            height: 40px;
+            font-size: 18px;
+            margin: 3px;
+            border: none;
+            background: lightblue;
+            border-radius: 5px;
+        }
+
+        button:hover{
+            background: blue;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+<h2>Calculator</h2>
+
+<input type="text" id="screen">
+
+<br>
+
+<button onclick="screen.value += '1'">1</button>
+<button onclick="screen.value += '2'">2</button>
+<button onclick="screen.value += '3'">3</button>
+<button onclick="screen.value += '+'">+</button>
+
+<br>
+
+<button onclick="screen.value += '4'">4</button>
+<button onclick="screen.value += '5'">5</button>
+<button onclick="screen.value += '6'">6</button>
+<button onclick="screen.value += '-'">-</button>
+
+<br>
+
+<button onclick="screen.value += '7'">7</button>
+<button onclick="screen.value += '8'">8</button>
+<button onclick="screen.value += '9'">9</button>
+<button onclick="screen.value += '*'">*</button>
+
+<br>
+
+<button onclick="screen.value += '0'">0</button>
+<button onclick="screen.value = ''">C</button>
+<button onclick="screen.value = eval(screen.value)">=</button>
+<button onclick="screen.value += '/'">/</button>
+
+</div>
+
+</body>
+</html>
