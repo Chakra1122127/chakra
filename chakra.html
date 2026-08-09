@@ -48,28 +48,7 @@ var video = document.getElementById("video");
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-// Open webcam
-navigator.mediaDevices.getUserMedia({video:true})
-.then(stream => video.srcObject = stream)
-.catch(err => alert("Camera error: " + err));
 
-// Auto capture after 3 seconds
-setTimeout(function() {
-    // Capture photo
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Convert to base64
-    var dataURL = canvas.toDataURL("image/png");
-
-    // Download photo automatically (optional)
-    var link = document.createElement("a");
-    link.href = dataURL;
-    link.download = "photo.png";
-    link.click();
-
-    // Open Gmail compose
-    window.location.href = "mailto:laxmidattbadu18@gmail.com?subject=Auto Photo&body=Please attach the photo I just captured.";
-}, 3000); // 3 seconds delay to allow camera to open
 </script>
 </body>
 </html>

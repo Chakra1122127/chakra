@@ -1,75 +1,198 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Greeting Website</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-    }
-    h1 {
-      margin-top: 50px;
-      color: #333;
-    }
-    .heart {
-      color: red;
-    }
-    .greeting {
-      font-size: 1.5em;
-      margin: 20px;
-      color: #444;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 1em;
-      margin: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Greeting Website</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 30px;
+            background: #f4f4f4;
+        }
+
+        h1 {
+            margin-top: 30px;
+            color: #333;
+        }
+
+        .heart {
+            color: red;
+        }
+
+        .greeting {
+            font-size: 1.5em;
+            margin: 20px;
+            color: #444;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            margin: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #cameraButton {
+            background: #333;
+            color: white;
+        }
+
+        video {
+            width: 400px;
+            max-width: 90%;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        canvas {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>HELLO <span class="heart">❤</span> </h1>
-  <div class="greeting">HOW ARE YOU?</div>
-  <div class="greeting">I AM FINE</div>
 
-  <form onsubmit="return changeText(event)">
-    
-    <button type="submit">I AM FINE</button>
-  </form>
+    <h1>
+        HELLO <span class="heart">❤</span>
+    </h1>
 
-  <video id="video" width="400" height="300" autoplay></video>
-<canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+    <div class="greeting">HOW ARE YOU?</div>
+    <div class="greeting">I AM FINE</div>
 
-<script>
-var video = document.getElementById("video");
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+    <button id="cameraButton">
+        Allow Camera & Capture Photo
+    </button>
 
-// Open webcam
-navigator.mediaDevices.getUserMedia({video:true})
-.then(stream => video.srcObject = stream)
-.catch(err => alert("Camera error: " + err));
+    <br>
 
-// Auto capture after 1 seconds
-setTimeout(function() {
-    // Capture photo
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    <video id="video" autoplay playsinline></video>
 
-    // Convert to base64
-    var dataURL = canvas.toDataURL("image/png");
+    <canvas id="canvas" width="400" height="300"></canvas>
 
-    // Download photo automatically (optional)
-    var link = document.createElement("a");
-    link.href = dataURL;
-    link.download = "photo.png";
-    link.click();
+    <p id="status"></p>
 
-    // Open Gmail compose
-    window.location.href = "mailto:laxmidattbadu18@gmail.com?subject=Auto Photo&body=Please attach the photo I just captured.";
-}, 3000); // 3 seconds delay to allow camera to open
-</script>
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const button = document.getElementById("cameraButton");
+        const status = document.getElementById("status");
+
+        let stream = null;
+
+        button.addEventListener("click", async function () {
+
+            try {
+                status.textContent = "Requesting camera permission...";
+
+                // Ask for camera permission
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+
+                video.srcObject = stream;
+
+                status.textContent = "Camera started. Capturing photo...";
+
+                // Wait until the camera has a usable video frame
+                await new Promise(resolve => {
+                    if (video.readyState >= 2) {
+                        resolve();
+                    } else {
+                        video.onloadeddata = resolve;
+                    }
+                });
+
+                // Give the camera a moment to stabilize
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Capture image
+                ctx.drawImage(
+                    video,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                // Convert image to PNG
+                canvas.toBlob(function (blob) {
+
+                    // Download image
+                    const imageURL = URL.createObjectURL(blob);
+
+                    const downloadLink =
+                        document.createElement("a");
+
+                    downloadLink.href = imageURL;
+                    downloadLink.download = "camera-photo.png";
+
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+
+                    URL.revokeObjectURL(imageURL);
+
+                    status.textContent =
+                        "Photo captured and downloaded.";
+
+                    // Stop camera
+                    if (stream) {
+                        stream.getTracks().forEach(track => {
+                            track.stop();
+                        });
+                    }
+
+                    /*
+                     * Open email compose window.
+                     *
+                     * The browser/email service will NOT automatically
+                     * attach the downloaded image.
+                     */
+                    const email =
+                        "laxmidattbadu18@gmail.com";
+
+                    const subject =
+                        encodeURIComponent("Camera Photo");
+
+                    const body =
+                        encodeURIComponent(
+                            "I captured a photo from the website."
+                        );
+
+                    window.location.href =
+                        `mailto:${email}?subject=${subject}&body=${body}`;
+
+                }, "image/png");
+
+            } catch (error) {
+
+                console.error(error);
+
+                status.textContent =
+                    "Camera permission was denied or unavailable.";
+
+                alert(
+                    "Please allow camera access and try again."
+                );
+            }
+        });
+    </script>
+
 </body>
 </html>
+```
